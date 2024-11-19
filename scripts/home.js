@@ -1,112 +1,59 @@
-// Define the URL of the CSV file containing movie titles
-const csvUrl = './movies.csv';
+// Fetch the JSON file from the assets folder
+fetch('https://portfolio-project-images-yash.s3.ap-south-1.amazonaws.com/movies_json.json')
+  .then(response => response.json()) // Parse the JSON response
+  .then(movieDataset => {
+    console.log(movieDataset); // Log the movie dataset to check the data
 
-const showRecBtn = document.getElementById('showRecBtn');
-const movieGrid = document.getElementById('movie-grid');
-const movieSearchInput = document.getElementById('movie-search');
-const movieSuggestionsList = document.getElementById('movie-suggestions');
-let movieTitles = [];
-
-// Function to fetch and populate movie titles
-function populateMovies() {
-  console.log('Fetching CSV data...');
-
-  Papa.parse(csvUrl, {
-    download: true,
-    header: true,  // Treat the first row as headers
-    complete: function(results) {
-      const movies = results.data;
-      movieTitles = movies.map(movie => movie.title).filter(title => title); // Ensure valid titles
-    },
-    error: function(error) {
-      console.error('Error loading or parsing CSV:', error);
+    // Function to filter movies based on user input
+    function filterMovies(query) {
+      return movieDataset.filter((movie) => movie.title.toLowerCase().startsWith(query.toLowerCase()));
     }
-  });
-}
 
-// Call the function to fetch movie titles on page load
-populateMovies();
+    // Autocomplete functionality for search bar
+    const searchBar = document.getElementById("movie-search");
+    const searchDropdown = document.getElementById("search-dropdown");
 
-// Function to filter movies based on search input
-function filterMovies(query) {
-  const lowerCaseQuery = query.toLowerCase();
-  return movieTitles.filter(title => title.toLowerCase().includes(lowerCaseQuery));
-}
-
-// Event listener for search input
-movieSearchInput.addEventListener('input', () => {
-  const searchValue = movieSearchInput.value;
-  const matchedMovies = filterMovies(searchValue);
-
-  // Clear previous suggestions
-  movieSuggestionsList.innerHTML = '';
-
-  // Display matched movie titles in suggestions list
-  matchedMovies.forEach(movie => {
-    const listItem = document.createElement('li');
-    listItem.textContent = movie;
-    listItem.addEventListener('click', () => {
-      movieSearchInput.value = movie; // Set the clicked movie as input value
-      movieSuggestionsList.innerHTML = ''; // Clear suggestions after selection
-    });
-    movieSuggestionsList.appendChild(listItem);
-  });
-
-  // If no matches, show a message
-  if (matchedMovies.length === 0 && searchValue) {
-    const noResultItem = document.createElement('li');
-    noResultItem.textContent = 'No matching movies found';
-    movieSuggestionsList.appendChild(noResultItem);
-  }
-});
-
-// Event listener for the recommendation button
-showRecBtn.addEventListener('click', () => {
-  const selectedMovie = movieSearchInput.value;
-
-  if (!selectedMovie) {
-    alert('Please select or type a movie.');
-    return;
-  }
-
-  // Send request to FastAPI backend
-  fetch(`http://127.0.0.1:8000/api/recommend_movie/?movie_name=${encodeURIComponent(selectedMovie)}`, {
-    method: 'GET',
-    headers: {
-      'accept': 'application/json'
-    }
-  })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Failed to fetch recommendations');
+    searchBar.addEventListener("input", () => {
+      const query = searchBar.value.trim();
+      searchDropdown.innerHTML = ""; // Clear the dropdown
+      if (query) {
+        const filteredMovies = filterMovies(query);
+        filteredMovies.forEach((movie) => {
+          const movieOption = document.createElement("p");
+          movieOption.textContent = movie.title;
+          movieOption.addEventListener("click", () => {
+            alert(`You selected: ${movie.title}`);
+            searchBar.value = movie.title;
+            searchDropdown.style.display = "none"; // Hide the dropdown after selection
+          });
+          searchDropdown.appendChild(movieOption);
+        });
+        searchDropdown.style.display = "block"; // Show the dropdown
+      } else {
+        searchDropdown.style.display = "none"; // Hide the dropdown if query is empty
       }
-      return response.json();
-    })
-    .then(data => {
-      // Clear previous movie recommendations
-      movieGrid.innerHTML = '';
+    });
 
-      // Loop through the recommended movies in the response
-      for (const movie in data) {
-        const movieDetails = data[movie];
+    // Function to display movies in the grid based on selected genres
+    const genres = ["Action", "Drama", "Animation", "Fantasy", "Romance"]; // Replace with the user's selected genres
+    const movieGrid = document.getElementById("movie-grid");
 
-        // Create a new movie card for each recommendation
-        const movieCard = document.createElement('div');
-        movieCard.classList.add('movie-card');
-
-        // Create the inner content for the movie card
-        const moviePoster = movieDetails.poster_path ? movieDetails.poster_path : './assets/spiderman.jpeg';
-        movieCard.innerHTML = `
-          <img src="${moviePoster}" alt="${movieDetails.title}">
-          <h3>${movieDetails.title}</h3>
-          <p>${movieDetails.tagline}</p>
+    // Function to display recommended movies
+    function displayRecommendedMovies() {
+      const filteredMovies = movieDataset.filter((movie) => genres.includes(movie.genre));
+      movieGrid.innerHTML = ""; // Clear previous content in the grid
+      filteredMovies.forEach((movie) => {
+        const movieTile = document.createElement("div");
+        movieTile.classList.add("movie-tile");
+        movieTile.innerHTML = `
+          <img src="${movie.img}" alt="${movie.title}">
+          <p>${movie.title}</p>
         `;
+        movieGrid.appendChild(movieTile); // Add the movie tile to the grid
+      });
+    }
 
-        // Append the movie card to the movie grid
-        movieGrid.appendChild(movieCard);
-      }
-    })
-    .catch(error => {
-      console.error('Error fetching recommendations:', error);
-    });
-});
+    // Initialize recommended movies when page loads
+    displayRecommendedMovies();
+  })
+  .catch(error => console.error("Error fetching the file:", error));

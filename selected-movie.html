@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Recommender</title>
+    <link rel="stylesheet" href="./styles/selected-movie.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-left">
+            <h1>Movie Recommender</h1>
+        </div>
+        <div class="navbar-right">
+            <input type="text" class="search-bar" placeholder="Search...">
+            <span class="user-name">Welcome, User</span>
+        </div>
+    </nav>
+
+    <!-- Movie Section -->
+    <div class="main-container">
+        <div class="movie-display">
+            <h2 id="movie-title">Spider-Man 3</h2>
+            <img src="https://via.placeholder.com/800x400" alt="Movie Demo" class="movie-video">
+            <p id="movie-description">
+                A young man with spider-like abilities fights crime and faces challenges balancing life, love, and responsibility.
+            </p>
+            <div class="rating-stars">
+                <span>Rate this movie:</span>
+                <span class="stars">
+                    <span class="star" onclick="rateMovie(1)">&#9733;</span>
+                    <span class="star" onclick="rateMovie(2)">&#9733;</span>
+                    <span class="star" onclick="rateMovie(3)">&#9733;</span>
+                    <span class="star" onclick="rateMovie(4)">&#9733;</span>
+                    <span class="star" onclick="rateMovie(5)">&#9733;</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Recommendations Section -->
+        <div class="recommendations">
+            <h3>You May Also Like...</h3>
+            <div class="movie-tiles">
+                <div class="tile">
+                    <img src="https://via.placeholder.com/150x200" alt="Movie 1">
+                    <p>Spider-Man 2</p>
+                </div>
+                <div class="tile">
+                    <img src="https://via.placeholder.com/150x200" alt="Movie 2">
+                    <p>Spider-Man</p>
+                </div>
+                <div class="tile">
+                    <img src="https://via.placeholder.com/150x200" alt="Movie 3">
+                    <p>The Amazing Spider-Man 2</p>
+                </div>
+                <div class="tile">
+                    <img src="https://via.placeholder.com/150x200" alt="Movie 4">
+                    <p>Arachnophobia</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/selected-movie.js"></script>
+</body>
+</html>
