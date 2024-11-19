@@ -1,31 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie Recommender - Home</title>
-    <link rel="stylesheet" href="styles/home.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Movie Recommender - Home</title>
+  <link rel="stylesheet" href="styles/home.css">
 </head>
+
 <body>
-    <!-- Navbar -->
-    <nav class="navbar">
-      <div class="navbar-left">
-          <h1>Movie Recommender</h1>
-      </div>
-      <div class="navbar-right">
-          <input type="text" class="search-bar" placeholder="Search...">
-          <span class="user-name">Welcome, User</span>
-      </div>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-left">
+      <h1>Movie Recommender</h1>
+    </div>
+    <div class="navbar-right">
+      <input type="text" class="search-bar" placeholder="Search..." id="searchBar">
+      <div class="suggestions" id="suggestionsBox"></div>
+      <span class="user-name">Welcome, User</span>
+    </div>
   </nav>
 
-    <!-- Main Content -->
-    <div class="main-container">
-        <h2>Recommended for You</h2>
-        <div class="movie-grid" id="movie-grid">
-            <!-- Movie tiles dynamically generated -->
-        </div>
+  <!-- Main Content -->
+  <div class="main-container">
+    <h2>Recommended for You</h2>
+    <div class="movie-grid" id="movie-grid">
+      <!-- Movie tiles dynamically generated -->
     </div>
+  </div>
 
-    <script src="scripts/home.js"></script>
+  <script src="scripts/home.js"></script>
 </body>
+
 </html>

@@ -1,59 +1,53 @@
+const searchBar = document.getElementById('searchBar');
+const suggestionsBox = document.getElementById('suggestionsBox');
+
+// Initialize an empty array for the movie dataset
+let movieDataset = [];
+
 // Fetch the JSON file from the assets folder
-fetch('./movies_json.json')
+fetch('./movies_json.json')  // Adjust the path if needed
   .then(response => response.json()) // Parse the JSON response
-  .then(movieDataset => {
-    console.log(movieDataset); // Log the movie dataset to check the data
-
-    // Function to filter movies based on user input
-    function filterMovies(query) {
-      return movieDataset.filter((movie) => movie.title.toLowerCase().startsWith(query.toLowerCase()));
-    }
-
-    // Autocomplete functionality for search bar
-    const searchBar = document.getElementById("movie-search");
-    const searchDropdown = document.getElementById("search-dropdown");
-
-    searchBar.addEventListener("input", () => {
-      const query = searchBar.value.trim();
-      searchDropdown.innerHTML = ""; // Clear the dropdown
-      if (query) {
-        const filteredMovies = filterMovies(query);
-        filteredMovies.forEach((movie) => {
-          const movieOption = document.createElement("p");
-          movieOption.textContent = movie.title;
-          movieOption.addEventListener("click", () => {
-            alert(`You selected: ${movie.title}`);
-            searchBar.value = movie.title;
-            searchDropdown.style.display = "none"; // Hide the dropdown after selection
-          });
-          searchDropdown.appendChild(movieOption);
-        });
-        searchDropdown.style.display = "block"; // Show the dropdown
-      } else {
-        searchDropdown.style.display = "none"; // Hide the dropdown if query is empty
-      }
-    });
-
-    // Function to display movies in the grid based on selected genres
-    const genres = ["Action", "Drama", "Animation", "Fantasy", "Romance"]; // Replace with the user's selected genres
-    const movieGrid = document.getElementById("movie-grid");
-
-    // Function to display recommended movies
-    function displayRecommendedMovies() {
-      const filteredMovies = movieDataset.filter((movie) => genres.includes(movie.genre));
-      movieGrid.innerHTML = ""; // Clear previous content in the grid
-      filteredMovies.forEach((movie) => {
-        const movieTile = document.createElement("div");
-        movieTile.classList.add("movie-tile");
-        movieTile.innerHTML = `
-          <img src="${movie.img}" alt="${movie.title}">
-          <p>${movie.title}</p>
-        `;
-        movieGrid.appendChild(movieTile); // Add the movie tile to the grid
-      });
-    }
-
-    // Initialize recommended movies when page loads
-    displayRecommendedMovies();
+  .then(data => {
+    movieDataset = data; // Store the fetched movie data
+    console.log('Movie Dataset Loaded:', movieDataset); // Log to verify data
   })
-  .catch(error => console.error("Error fetching the file:", error));
+  .catch(error => console.error('Error fetching movie data:', error)); // Handle errors
+
+// Event listener for search bar input
+searchBar.addEventListener('input', () => {
+  const query = searchBar.value.toLowerCase();
+
+  // Filter movies based on the input query
+  const suggestions = movieDataset.filter(movie => {
+    // Ensure that original_title is a string before calling toLowerCase
+    return typeof movie.original_title === 'string' &&
+      movie.original_title.toLowerCase().includes(query);
+  });
+
+  // Clear the suggestions box
+  suggestionsBox.innerHTML = '';
+
+  // Populate suggestions if matches are found
+  if (query && suggestions.length) {
+    suggestions.forEach(movie => {
+      const suggestionItem = document.createElement('div');
+      suggestionItem.classList.add('suggestion-item');
+      suggestionItem.textContent = movie.original_title;
+
+      // Add click event to select suggestion
+      suggestionItem.addEventListener('click', () => {
+        searchBar.value = movie.original_title; // Set the selected movie name
+        suggestionsBox.innerHTML = ''; // Clear suggestions
+      });
+
+      suggestionsBox.appendChild(suggestionItem); // Add to the suggestions box
+    });
+  }
+});
+
+// Hide suggestions box when clicking outside
+document.addEventListener('click', (e) => {
+  if (!searchBar.contains(e.target) && !suggestionsBox.contains(e.target)) {
+    suggestionsBox.innerHTML = ''; // Clear suggestions
+  }
+});
