@@ -1,7 +1,7 @@
 // Add your API endpoint here
 var API_ENDPOINT = "https://kglp45qha6.execute-api.ap-south-1.amazonaws.com/post-rs-users";
 
-// AJAX POST request for registration
+// AJAX POST request for registrati``on
 function handleRegister(event) {
     event.preventDefault(); // Prevent the default form submission
 

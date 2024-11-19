@@ -1,5 +1,5 @@
 // Fetch the JSON file from the assets folder
-fetch('https://portfolio-project-images-yash.s3.ap-south-1.amazonaws.com/movies_json.json')
+fetch('./movies_json.json')
   .then(response => response.json()) // Parse the JSON response
   .then(movieDataset => {
     console.log(movieDataset); // Log the movie dataset to check the data
