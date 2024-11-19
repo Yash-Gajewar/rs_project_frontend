@@ -34,6 +34,7 @@ body {
   background-color: #333;
   color: white;
   width: 300px;
+  height: 30px;
 }
 
 .user-name {
@@ -45,7 +46,7 @@ body {
   position: absolute;
   top: 45px;  /* Adjust the position */
   width: 300px;
-  max-height: 150px;
+  max-height: 250px;
   overflow-y: auto;
   background: #333;
   color: white;
