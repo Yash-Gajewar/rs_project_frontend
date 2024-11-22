@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flicksy</title>
     <link rel="stylesheet" href="styles/genre.css">
 </head>
+
 <body>
     <!-- Navbar -->
     <nav class="navbar">
@@ -23,9 +25,12 @@
         <div class="genre-grid" id="genreGrid">
             <!-- Genres will be populated dynamically with JavaScript -->
         </div>
-        <button id="startButton" class="start-button" disabled>Start Watching</button>
+        <button id="startButton" class="start-button" disabled onclick="return handleSubmit(event);">Start
+            Watching</button>
     </div>
-
+    <!-- Add this script tag before your genre.js script -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="scripts/genre.js"></script>
 </body>
+
 </html>

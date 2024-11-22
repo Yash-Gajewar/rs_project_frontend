@@ -128,5 +128,41 @@ function renderMovieCards(data) {
   });
 }
 
-// Call the render function to display movie cards
-renderMovieCards(movieData);
+
+selectedGenres = localStorage.getItem('genre')
+
+// Function to fetch recommended movies based on selected genres
+function fetchRecommendedMovies(selectedGenres) {
+  // Check if selectedGenres is not empty
+  if (selectedGenres.length === 0) {
+    alert("Please select at least one genre.");
+    return;
+  }
+
+  // Make a POST request to the API
+  fetch("http://127.0.0.1:8000/api/recommend_movie/top_5", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify(selectedGenres), // Send genres as an array
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json(); // Parse JSON response
+    })
+    .then((data) => {
+      console.log("Recommended Movies:", data); // Log the movie data
+      renderMovieCards(data); // Pass data to the render function
+    })
+    .catch((error) => {
+      console.error("Error fetching recommended movies:", error);
+      alert("Failed to fetch recommended movies. Please try again.");
+    });
+}
+
+
+

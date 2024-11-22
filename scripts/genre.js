@@ -61,3 +61,46 @@ document.getElementById("startButton").addEventListener("click", () => {
     // Add functionality to navigate or save preferences
     window.location.href = "home.html";
 });
+
+
+document.getElementById("startButton").addEventListener("click", () => {
+    if (selectedGenres.length < 3) {
+        alert("Please select at least 5 genres.");
+        return;
+    }
+});
+
+
+function handleSubmit() {
+
+    localStorage.setItem('genre', selectedGenres)
+
+    if (selectedGenres.length < 5) {
+        alert("Please select at least 5 genres.");
+        return;
+    }
+
+    const email = "sahil.shah@spit.ac.in"; // Replace with the actual user's email
+    const inputData = {
+        genre: selectedGenres, // Only genres go in the body
+    };
+
+    // Construct the URL with the email as a query parameter
+    const url = `http://127.0.0.1:8000/api/user/genre?email=${encodeURIComponent(email)}`;
+
+    // Make an AJAX request
+    $.ajax({
+        url: url, // Send email in query string
+        type: "POST",
+        data: JSON.stringify(inputData), // Send genres in the body
+        contentType: "application/json; charset=utf-8",
+        success: function (response) {
+            alert("Genres saved successfully!");
+            window.location.href = "home.html";
+        },
+        error: function (xhr, status, error) {
+            const errorMessage = xhr.responseJSON?.detail || "Unknown error occurred.";
+            alert("Error saving genres: " + errorMessage);
+        },
+    });
+}
