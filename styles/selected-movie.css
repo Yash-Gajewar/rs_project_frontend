@@ -65,30 +65,33 @@ body {
     transform: scale(1.2);
   }
   
-  /* Recommendations Section */
-  .recommendations {
-    margin-top: 40px;
-  }
-  
-  .recommendations h3 {
-    margin-bottom: 20px;
-  }
-  
-  .movie-tiles {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
-  }
-  
-  .tile img {
-    width: 150px;
-    height: 200px;
-    border-radius: 10px;
-  }
-  
-  .tile p {
-    margin: 10px 0 0 0;
-    font-size: 14px;
-  }
-  
+ /* Movie Grid */
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 20px;
+  justify-items: center;
+  padding: 10px 20px;
+}
+
+.movie-tile {
+  text-align: center;
+}
+
+.movie-tile img {
+  width: 150px;
+  height: 200px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.movie-tile img:hover {
+  transform: scale(1.1);
+}
+
+.movie-tile p {
+  font-size: 14px;
+  margin: 0;
+}

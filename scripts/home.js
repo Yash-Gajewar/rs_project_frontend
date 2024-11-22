@@ -1,11 +1,13 @@
+// Get references to the DOM elements
 const searchBar = document.getElementById('searchBar');
 const suggestionsBox = document.getElementById('suggestionsBox');
+const movieGrid = document.getElementById('movie-grid');
 
 // Initialize an empty array for the movie dataset
 let movieDataset = [];
 
 // Fetch the JSON file from the assets folder
-fetch('./movies_json.json')  // Adjust the path if needed
+fetch('./movies_json.json') // Adjust the path to the actual location of your JSON file
   .then(response => response.json()) // Parse the JSON response
   .then(data => {
     movieDataset = data; // Store the fetched movie data
@@ -15,13 +17,14 @@ fetch('./movies_json.json')  // Adjust the path if needed
 
 // Event listener for search bar input
 searchBar.addEventListener('input', () => {
-  const query = searchBar.value.toLowerCase();
+  const query = searchBar.value.toLowerCase(); // Convert input to lowercase for case-insensitive matching
 
   // Filter movies based on the input query
   const suggestions = movieDataset.filter(movie => {
-    // Ensure that original_title is a string before calling toLowerCase
-    return typeof movie.original_title === 'string' &&
-      movie.original_title.toLowerCase().includes(query);
+    return (
+      typeof movie.original_title === 'string' &&
+      movie.original_title.toLowerCase().includes(query) // Match movies by title
+    );
   });
 
   // Clear the suggestions box
@@ -36,18 +39,94 @@ searchBar.addEventListener('input', () => {
 
       // Add click event to select suggestion
       suggestionItem.addEventListener('click', () => {
-        searchBar.value = movie.original_title; // Set the selected movie name
-        suggestionsBox.innerHTML = ''; // Clear suggestions
+        searchBar.value = movie.original_title; // Set the selected movie name in the search bar
+        suggestionsBox.innerHTML = ''; // Clear the suggestions box
       });
 
-      suggestionsBox.appendChild(suggestionItem); // Add to the suggestions box
+      suggestionsBox.appendChild(suggestionItem); // Add suggestion to the box
     });
   }
 });
 
 // Hide suggestions box when clicking outside
-document.addEventListener('click', (e) => {
+document.addEventListener('click', e => {
   if (!searchBar.contains(e.target) && !suggestionsBox.contains(e.target)) {
-    suggestionsBox.innerHTML = ''; // Clear suggestions
+    suggestionsBox.innerHTML = ''; // Clear suggestions when clicking outside
   }
 });
+
+// Sample movie dataset in JSON format
+const movieData = {
+  Action: [
+    {
+      id: 69848,
+      title: "One Man's Hero",
+      overview: "One Man's Hero tells the little-known story of the 'St. Patrick's Battalion'...",
+      genres: ["Western", "Action", "Drama", "History"],
+      vote_average: 9.3
+    },
+    {
+      id: 155,
+      title: "The Dark Knight",
+      overview: "Batman raises the stakes in his war on crime...",
+      genres: ["Drama", "Action", "Crime", "Thriller"],
+      vote_average: 8.2
+    }
+    // Add more movies as needed
+  ],
+  Adventure: [
+    {
+      id: 43867,
+      title: "The Prisoner of Zenda",
+      overview: "An Englishman on a Ruritarian holiday must impersonate the king...",
+      genres: ["Adventure", "Drama", "Romance"],
+      vote_average: 7.5
+    }
+  ]
+};
+
+// Function to create and render movie cards
+function renderMovieCards(data) {
+  // Iterate through each genre
+  Object.keys(data).forEach(genre => {
+    // Iterate through movies in each genre
+    data[genre].forEach(movie => {
+      // Create movie card container
+      const movieTile = document.createElement('div');
+      movieTile.classList.add('movie-tile');
+
+      // Add movie image (placeholder for now)
+      const movieImg = document.createElement('img');
+      movieImg.src = 'https://via.placeholder.com/150x200'; // Placeholder image URL
+      movieImg.alt = movie.title;
+
+      // Add movie title
+      const movieTitle = document.createElement('p');
+      movieTitle.textContent = movie.title;
+
+      // Append elements to movie card
+      movieTile.appendChild(movieImg);
+      movieTile.appendChild(movieTitle);
+
+      // Add click event to store selected movie in local storage and redirect
+      movieTile.addEventListener('click', () => {
+        const selectedMovie = {
+          id: movie.id,
+          name: movie.title,
+          overview: movie.overview
+        };
+        localStorage.setItem('selected-movie', JSON.stringify(selectedMovie)); // Store movie details in local storage
+        console.log('Selected Movie Stored:', selectedMovie); // Log the selected movie
+
+        // Redirect to the selected-movie.html page
+        window.location.href = 'selected-movie.html';
+      });
+
+      // Append movie card to the grid
+      movieGrid.appendChild(movieTile);
+    });
+  });
+}
+
+// Call the render function to display movie cards
+renderMovieCards(movieData);
