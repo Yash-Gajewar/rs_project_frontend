@@ -96,50 +96,6 @@ document.addEventListener('DOMContentLoaded', displayMovieDetails);
 document.addEventListener('DOMContentLoaded', displayMovieDetails);
 
 
-// Function to create and render movie cards
-function renderMovieCards(data) {
-  // Iterate through each genre
-  Object.keys(data).forEach(genre => {
-    // Iterate through movies in each genre
-    data.forEach(movie => {
-      // Create movie card container
-      const movieTile = document.createElement('div');
-      movieTile.classList.add('movie-tile');
-
-      // Add movie image (placeholder for now)
-      const movieImg = document.createElement('img');
-      movieImg.src = 'https://via.placeholder.com/150x200'; // Placeholder image URL
-      movieImg.alt = movie.title;
-
-      // Add movie title
-      const movieTitle = document.createElement('p');
-      movieTitle.textContent = movie.title;
-
-      // Append elements to movie card
-      movieTile.appendChild(movieImg);
-      movieTile.appendChild(movieTitle);
-
-      // Add click event to store selected movie in local storage and redirect
-      movieTile.addEventListener('click', () => {
-        const selectedMovie = {
-          id: movie.id,
-          name: movie.title,
-          overview: movie.overview
-        };
-        localStorage.setItem('selected-movie', JSON.stringify(selectedMovie)); // Store movie details in local storage
-        console.log('Selected Movie Stored:', selectedMovie); // Log the selected movie
-
-        // Redirect to the selected-movie.html page
-        window.location.href = 'selected-movie.html';
-      });
-
-      // Append movie card to the grid
-      movieGrid.appendChild(movieTile);
-    });
-  });
-}
-
-
 // Function to handle hover effect
 function handleHover(event) {
   const stars = document.querySelectorAll('.star');
@@ -173,3 +129,81 @@ stars.forEach((star) => {
 
 // Call the render function to display movie cards
 // renderMovieCards(movieData);
+
+
+async function fetchMovieDetails(movieId) {
+  try {
+    const url = `https://api.themoviedb.org/3/movie/${movieId}?api_key=83b44cdf02bdd95a7c2fa4ab67514e6a&language=en-US`;
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch details for movie ID ${movieId}`);
+    }
+    const responseData = await response.json();
+    return {
+      posterPath: `https://image.tmdb.org/t/p/w500/${responseData.poster_path || ''}`,
+      title: responseData.original_title || 'No title available',
+      overview: responseData.overview || 'No overview available',
+      tagline: responseData.tagline || '',
+    };
+  } catch (error) {
+    console.error('Error fetching movie details:', error);
+    return null;
+  }
+}
+
+
+
+async function renderMovieCards(data) {
+  movieGrid.innerHTML = ''; // Clear previous movie cards
+  const addedMovies = new Set(); // Track added movies by their IDs
+
+  for (const genre of Object.keys(data)) {
+    for (const movie of data) {
+      // Skip duplicates
+      if (addedMovies.has(movie.id)) {
+        continue;
+      }
+
+      // Mark movie as added
+      addedMovies.add(movie.id);
+
+      // Fetch movie details
+      const movieDetails = await fetchMovieDetails(movie.id);
+      if (!movieDetails) {
+        continue; // Skip if movie details couldn't be fetched
+      }
+
+      // Create movie card
+      const movieTile = document.createElement('div');
+      movieTile.classList.add('movie-tile');
+
+      // Add movie image
+      const movieImg = document.createElement('img');
+      movieImg.src = movieDetails.posterPath || 'https://via.placeholder.com/150x200';
+      movieImg.alt = movieDetails.title;
+
+      // Add movie title
+      const movieTitle = document.createElement('p');
+      movieTitle.textContent = movieDetails.title;
+
+      // Append elements
+      movieTile.appendChild(movieImg);
+      movieTile.appendChild(movieTitle);
+
+      // Add click event
+      movieTile.addEventListener('click', () => {
+        const selectedMovie = {
+          id: movie.id,
+          name: movieDetails.title,
+          overview: movieDetails.overview,
+        };
+        localStorage.setItem('selected-movie', JSON.stringify(selectedMovie));
+        console.log('Selected Movie Stored:', selectedMovie);
+        window.location.href = 'selected-movie.html';
+      });
+
+      movieGrid.appendChild(movieTile);
+    }
+  }
+}
+
