@@ -3,6 +3,11 @@ const searchBar = document.getElementById('searchBar');
 const suggestionsBox = document.getElementById('suggestionsBox');
 const movieGrid = document.getElementById('movie-grid');
 
+
+const username = document.getElementById('username');
+
+username.innerHTML = localStorage.getItem('username');
+
 // Initialize an empty array for the movie dataset
 let movieDataset = [];
 
@@ -90,7 +95,7 @@ function renderMovieCards(data) {
   // Iterate through each genre
   Object.keys(data).forEach(genre => {
     // Iterate through movies in each genre
-    data[genre].forEach(movie => {
+    data[genres].forEach(movie => {
       // Create movie card container
       const movieTile = document.createElement('div');
       movieTile.classList.add('movie-tile');
@@ -129,24 +134,12 @@ function renderMovieCards(data) {
 }
 
 
-selectedGenres = localStorage.getItem('genre')
 
-// Function to fetch recommended movies based on selected genres
 function fetchRecommendedMovies(selectedGenres) {
-  // Check if selectedGenres is not empty
-  if (selectedGenres.length === 0) {
-    alert("Please select at least one genre.");
-    return;
-  }
 
   // Make a POST request to the API
-  fetch("http://127.0.0.1:8000/api/recommend_movie/top_5", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    body: JSON.stringify(selectedGenres), // Send genres as an array
+  fetch(`http://127.0.0.1:8000/api/recommend_movie/top_5?genre=${selectedGenres}`, {
+    method: "POST"
   })
     .then((response) => {
       if (!response.ok) {
@@ -159,10 +152,9 @@ function fetchRecommendedMovies(selectedGenres) {
       renderMovieCards(data); // Pass data to the render function
     })
     .catch((error) => {
-      console.error("Error fetching recommended movies:", error);
-      alert("Failed to fetch recommended movies. Please try again.");
+      console.log(error)
     });
 }
 
 
-
+fetchRecommendedMovies(localStorage.getItem('genre'))

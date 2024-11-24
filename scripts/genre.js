@@ -1,3 +1,8 @@
+const username = document.getElementById('username');
+
+username.innerHTML = localStorage.getItem('username');
+
+
 // Data for genres
 const genres = [
     { id: 1, name: "Action", image: "./assets/action.jpg" },
@@ -80,7 +85,7 @@ function handleSubmit() {
         return;
     }
 
-    const email = "sahil.shah@spit.ac.in"; // Replace with the actual user's email
+    const email = localStorage.getItem('email') // Replace with the actual user's email
     const inputData = {
         genre: selectedGenres, // Only genres go in the body
     };

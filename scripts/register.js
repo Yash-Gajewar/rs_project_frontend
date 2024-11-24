@@ -3,9 +3,13 @@
 
 // AJAX POST request for registrati``on
 function handleRegister(event) {
+
+    
     event.preventDefault(); // Prevent the default form submission
-
-
+    
+    localStorage.setItem("email", $('#email').val());
+    localStorage.setItem("username", $('#username').val());
+    
     // Gather the form input data
     var inputData = {
         "email": $('#email').val(),
@@ -25,11 +29,10 @@ function handleRegister(event) {
             // If registration is successful, redirect to home.html
             if (response.statusCode === 200) {
                 alert("Registration successful!"); 
-                window.location.href = "home.html"; 
+                window.location.href = "genre.html"; 
             } else {
                 // If registration fails, show an alert with the reason
                 alert("Registration failed: " + responseData.reason);
-                window.location.href = "genre.html"; 
             }
         },
         error: function() {
