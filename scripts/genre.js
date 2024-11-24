@@ -60,9 +60,7 @@ function toggleGenreSelection(tile, name) {
 }
 
 // Start button functionality
-document.getElementById("startButton").addEventListener("click", () => {
-    alert(`Genres selected: ${selectedGenres.join(", ")}`);
-    
+document.getElementById("startButton").addEventListener("click", () => {    
     // Add functionality to navigate or save preferences
     window.location.href = "home.html";
 });
@@ -100,7 +98,6 @@ function handleSubmit() {
         data: JSON.stringify(inputData), // Send genres in the body
         contentType: "application/json; charset=utf-8",
         success: function (response) {
-            alert("Genres saved successfully!");
             window.location.href = "home.html";
         },
         error: function (xhr, status, error) {

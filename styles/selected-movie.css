@@ -50,7 +50,7 @@ body {
     margin: 20px 0;
     border-radius: 10px;
   }
-  
+/*   
   .rating-stars {
     margin: 20px 0;
   }
@@ -63,7 +63,21 @@ body {
   
   .stars .star:hover {
     transform: scale(1.2);
-  }
+  } */
+
+  /* Default star color (grey) */
+.star {
+  font-size: 30px; /* Adjust size as needed */
+  color: grey;
+  cursor: pointer;
+  transition: color 0.2s ease-in-out; /* Smooth transition for hover effect */
+}
+
+/* Hover state for stars, all previous ones become yellow */
+.star.hovered {
+  color: yellow;
+}
+
   
  /* Movie Grid */
 .movie-grid {

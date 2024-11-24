@@ -5,7 +5,6 @@ const movieGrid = document.getElementById('movie-grid');
 
 
 const username = document.getElementById('username');
-
 username.innerHTML = localStorage.getItem('username');
 
 // Initialize an empty array for the movie dataset

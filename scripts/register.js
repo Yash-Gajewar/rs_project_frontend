@@ -29,16 +29,17 @@ function handleRegister(event) {
             // If registration is successful, redirect to home.html
             if (response.statusCode === 200) {
                 alert("Registration successful!"); 
-                window.location.href = "genre.html"; 
             } else {
                 // If registration fails, show an alert with the reason
                 alert("Registration failed: " + responseData.reason);
             }
+
         },
         error: function() {
             alert("Error during registration.");
         }
     });
 
+    window.location.href = "genre.html"; 
     return false; // Prevent the default form submission
 }

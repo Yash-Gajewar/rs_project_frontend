@@ -13,7 +13,7 @@
             <h1>Flicksy</h1>
         </div>
         <div class="navbar-right">
-            <span class="user-name">Welcome, User</span>
+            <span class="user-name">Welcome, <span id="username"></span></span>
         </div>
     </nav>
 
@@ -21,20 +21,21 @@
     <div class="main-container">
         <div class="movie-display">
             <h2 id="movie-title">Spider-Man 3</h2>
-            <img src="https://via.placeholder.com/800x400" alt="Movie Demo" class="movie-video">
+            <img src="https://via.placeholder.com/800x400" alt="Movie Demo" class="movie-video" height="600" width="900">
             <p id="movie-description">
                 A young man with spider-like abilities fights crime and faces challenges balancing life, love, and responsibility.
             </p>
             <div class="rating-stars">
                 <span>Rate this movie:</span>
                 <span class="stars">
-                    <span class="star" onclick="rateMovie(1)">&#9733;</span>
-                    <span class="star" onclick="rateMovie(2)">&#9733;</span>
-                    <span class="star" onclick="rateMovie(3)">&#9733;</span>
-                    <span class="star" onclick="rateMovie(4)">&#9733;</span>
-                    <span class="star" onclick="rateMovie(5)">&#9733;</span>
+                    <span class="star" data-index="1" onclick="rateMovie(1)">&#9733;</span>
+                    <span class="star" data-index="2" onclick="rateMovie(2)">&#9733;</span>
+                    <span class="star" data-index="3" onclick="rateMovie(3)">&#9733;</span>
+                    <span class="star" data-index="4" onclick="rateMovie(4)">&#9733;</span>
+                    <span class="star" data-index="5" onclick="rateMovie(5)">&#9733;</span>
                 </span>
             </div>
+            
         </div>
 
 
