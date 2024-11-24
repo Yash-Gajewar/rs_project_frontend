@@ -92,9 +92,18 @@ const movieData = {
 
 function renderMovieCards(data) {
   movieGrid.innerHTML = ''; // Clear previous movie cards
+  const addedMovies = new Set(); // Track added movies by their IDs
 
   Object.keys(data).forEach(genre => {
     data.forEach(movie => {
+      // Check if the movie has already been added
+      if (addedMovies.has(movie.id)) {
+        return; // Skip duplicates
+      }
+
+      // Add movie ID to the set
+      addedMovies.add(movie.id);
+
       // Create movie card
       const movieTile = document.createElement('div');
       movieTile.classList.add('movie-tile');
@@ -128,6 +137,7 @@ function renderMovieCards(data) {
     });
   });
 }
+
 
 
 
