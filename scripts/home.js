@@ -90,44 +90,40 @@ const movieData = {
   ]
 };
 
-// Function to create and render movie cards
 function renderMovieCards(data) {
-  // Iterate through each genre
+  movieGrid.innerHTML = ''; // Clear previous movie cards
+
   Object.keys(data).forEach(genre => {
-    // Iterate through movies in each genre
-    data[genres].forEach(movie => {
-      // Create movie card container
+    data.forEach(movie => {
+      // Create movie card
       const movieTile = document.createElement('div');
       movieTile.classList.add('movie-tile');
 
-      // Add movie image (placeholder for now)
+      // Add movie image
       const movieImg = document.createElement('img');
-      movieImg.src = 'https://via.placeholder.com/150x200'; // Placeholder image URL
+      movieImg.src = movie.poster_path || 'https://via.placeholder.com/150x200';
       movieImg.alt = movie.title;
 
       // Add movie title
       const movieTitle = document.createElement('p');
       movieTitle.textContent = movie.title;
 
-      // Append elements to movie card
+      // Append elements
       movieTile.appendChild(movieImg);
       movieTile.appendChild(movieTitle);
 
-      // Add click event to store selected movie in local storage and redirect
+      // Add click event
       movieTile.addEventListener('click', () => {
         const selectedMovie = {
           id: movie.id,
           name: movie.title,
           overview: movie.overview
         };
-        localStorage.setItem('selected-movie', JSON.stringify(selectedMovie)); // Store movie details in local storage
-        console.log('Selected Movie Stored:', selectedMovie); // Log the selected movie
-
-        // Redirect to the selected-movie.html page
+        localStorage.setItem('selected-movie', JSON.stringify(selectedMovie));
+        console.log('Selected Movie Stored:', selectedMovie);
         window.location.href = 'selected-movie.html';
       });
 
-      // Append movie card to the grid
       movieGrid.appendChild(movieTile);
     });
   });
