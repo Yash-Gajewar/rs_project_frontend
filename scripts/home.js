@@ -90,19 +90,45 @@ const movieData = {
   ]
 };
 
-function renderMovieCards(data) {
+async function fetchMovieDetails(movieId) {
+  try {
+    const url = `https://api.themoviedb.org/3/movie/${movieId}?api_key=83b44cdf02bdd95a7c2fa4ab67514e6a&language=en-US`;
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch details for movie ID ${movieId}`);
+    }
+    const responseData = await response.json();
+    return {
+      posterPath: `https://image.tmdb.org/t/p/w500/${responseData.poster_path || ''}`,
+      title: responseData.original_title || 'No title available',
+      overview: responseData.overview || 'No overview available',
+      tagline: responseData.tagline || '',
+    };
+  } catch (error) {
+    console.error('Error fetching movie details:', error);
+    return null;
+  }
+}
+
+async function renderMovieCards(data) {
   movieGrid.innerHTML = ''; // Clear previous movie cards
   const addedMovies = new Set(); // Track added movies by their IDs
 
-  Object.keys(data).forEach(genre => {
-    data.forEach(movie => {
-      // Check if the movie has already been added
+  for (const genre of Object.keys(data)) {
+    for (const movie of data) {
+      // Skip duplicates
       if (addedMovies.has(movie.id)) {
-        return; // Skip duplicates
+        continue;
       }
 
-      // Add movie ID to the set
+      // Mark movie as added
       addedMovies.add(movie.id);
+
+      // Fetch movie details
+      const movieDetails = await fetchMovieDetails(movie.id);
+      if (!movieDetails) {
+        continue; // Skip if movie details couldn't be fetched
+      }
 
       // Create movie card
       const movieTile = document.createElement('div');
@@ -110,12 +136,12 @@ function renderMovieCards(data) {
 
       // Add movie image
       const movieImg = document.createElement('img');
-      movieImg.src = movie.poster_path || 'https://via.placeholder.com/150x200';
-      movieImg.alt = movie.title;
+      movieImg.src = movieDetails.posterPath || 'https://via.placeholder.com/150x200';
+      movieImg.alt = movieDetails.title;
 
       // Add movie title
       const movieTitle = document.createElement('p');
-      movieTitle.textContent = movie.title;
+      movieTitle.textContent = movieDetails.title;
 
       // Append elements
       movieTile.appendChild(movieImg);
@@ -125,8 +151,8 @@ function renderMovieCards(data) {
       movieTile.addEventListener('click', () => {
         const selectedMovie = {
           id: movie.id,
-          name: movie.title,
-          overview: movie.overview
+          name: movieDetails.title,
+          overview: movieDetails.overview,
         };
         localStorage.setItem('selected-movie', JSON.stringify(selectedMovie));
         console.log('Selected Movie Stored:', selectedMovie);
@@ -134,9 +160,10 @@ function renderMovieCards(data) {
       });
 
       movieGrid.appendChild(movieTile);
-    });
-  });
+    }
+  }
 }
+
 
 
 
