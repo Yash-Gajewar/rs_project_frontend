@@ -7,7 +7,6 @@ const movieData = localStorage.getItem('selected-movie');
 const movie = JSON.parse(movieData);
 
 
-// JS for handling movie rating
 function rateMovie(rating) {
   alert(`You rated this movie ${rating} star(s)!`);
 
@@ -19,17 +18,18 @@ function rateMovie(rating) {
 
   const apiUrl = `http://localhost:8000/api/user/post_ratings?email=${localStorage.getItem('email')}`;
 
-  user_ratings_data = []
-
-  user_ratings_data.push(movie.name)
-  user_ratings_data.push(parseFloat(rating))
+  // Prepare the ratings data as an array
+  const user_ratings_data = [
+    movie.name,  // Replace with the correct variable for the movie name
+    rating.toString()  // Convert the rating to a string
+  ];
 
   fetch(apiUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(user_ratings_data)
+    body: JSON.stringify(user_ratings_data)  // Send as a JSON array
   })
     .then(response => response.json())
     .then(data => {
@@ -39,6 +39,8 @@ function rateMovie(rating) {
       console.error('Error posting rating:', error);
     });
 }
+
+
 
 function getContentBasedRecommendMovies(movieName) {
   // URL encode the movie name to handle spaces and special characters
