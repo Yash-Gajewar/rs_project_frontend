@@ -3,6 +3,10 @@ username.innerHTML = localStorage.getItem('username');
 
 const movieGrid = document.getElementById('movie-grid');
 
+const movieData = localStorage.getItem('selected-movie');
+const movie = JSON.parse(movieData);
+
+
 // JS for handling movie rating
 function rateMovie(rating) {
   alert(`You rated this movie ${rating} star(s)!`);
@@ -12,6 +16,28 @@ function rateMovie(rating) {
   ratingStars.forEach(star => {
     star.style.display = 'none';
   });
+
+  const apiUrl = `http://localhost:8000/api/user/post_ratings?email=${localStorage.getItem('email')}`;
+
+  user_ratings_data = []
+
+  user_ratings_data.push(movie.name)
+  user_ratings_data.push(parseFloat(rating))
+
+  fetch(apiUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(user_ratings_data)
+  })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Rating posted:', data);
+    })
+    .catch(error => {
+      console.error('Error posting rating:', error);
+    });
 }
 
 function getContentBasedRecommendMovies(movieName) {
@@ -28,15 +54,15 @@ function getContentBasedRecommendMovies(movieName) {
       'Accept': 'application/json', // Set accept header to JSON
     }
   })
-  .then(response => response.json()) // Parse the JSON response
-  .then(data => {
-    console.log('Recommended Movies:', data);
-    renderMovieCards(data);
-    // Here you can process and display the recommended movies as needed
-  })
-  .catch(error => {
-    console.error('Error fetching recommendations:', error);
-  });
+    .then(response => response.json()) // Parse the JSON response
+    .then(data => {
+      console.log('Recommended Movies:', data);
+      renderMovieCards(data);
+      // Here you can process and display the recommended movies as needed
+    })
+    .catch(error => {
+      console.error('Error fetching recommendations:', error);
+    });
 }
 
 
@@ -62,31 +88,17 @@ async function fetchMovieImage(movieId) {
 
 // Function to display movie details from local storage
 async function displayMovieDetails() {
-  // Retrieve movie details from local storage
-  const movieData = localStorage.getItem('selected-movie');
 
-  // Check if movie data is available
-  if (movieData) {
+  // Populate HTML elements with movie details
+  document.getElementById('movie-title').textContent = movie.name;
+  document.getElementById('movie-description').textContent = movie.overview;
 
-    const movie = JSON.parse(movieData);
+  const movieImageElement = document.querySelector('.movie-video');
 
-    getContentBasedRecommendMovies(movie.name); // Get content-based recommendations for the selected movie
-
-    // Populate HTML elements with movie details
-    document.getElementById('movie-title').textContent = movie.name;
-    document.getElementById('movie-description').textContent = movie.overview;
-
-    const movieImageElement = document.querySelector('.movie-video');
-
-    // Fetch the movie image dynamically
-    const imageData = await fetchMovieImage(movie.id);
-    movieImageElement.src = imageData.posterPath;
-    movieImageElement.alt = movie.name;
-  } else {
-    // If no movie data is found, redirect to the main page
-    alert('No movie details found! Redirecting to the home page.');
-    window.location.href = 'index.html';
-  }
+  // Fetch the movie image dynamically
+  const imageData = await fetchMovieImage(movie.id);
+  movieImageElement.src = imageData.posterPath;
+  movieImageElement.alt = movie.name;
 }
 
 // Call the function to display movie details on page load
@@ -100,7 +112,7 @@ document.addEventListener('DOMContentLoaded', displayMovieDetails);
 function handleHover(event) {
   const stars = document.querySelectorAll('.star');
   const hoveredIndex = parseInt(event.target.getAttribute('data-index')); // Get the index of the hovered star
-  
+
   stars.forEach((star, index) => {
     if (index < hoveredIndex) {
       star.classList.add('hovered'); // Add "hovered" class to all previous stars
@@ -207,3 +219,5 @@ async function renderMovieCards(data) {
   }
 }
 
+
+getContentBasedRecommendMovies(movie.name); // Get content-based recommendations for the selected movie
