@@ -19,8 +19,9 @@ fetch('./movies_json.json') // Adjust the path to the actual location of your JS
   })
   .catch(error => console.error('Error fetching movie data:', error)); // Handle errors
 
+
 // Event listener for search bar input
-searchBar.addEventListener('input', () => {
+searchBar.addEventListener('input', async () => { // Fixed the async declaration
   const query = searchBar.value.toLowerCase(); // Convert input to lowercase for case-insensitive matching
 
   // Filter movies based on the input query
@@ -42,25 +43,39 @@ searchBar.addEventListener('input', () => {
       suggestionItem.textContent = movie.original_title;
 
       // Add click event to select suggestion
-      suggestionItem.addEventListener('click', () => {
+      suggestionItem.addEventListener('click', async () => { // Added async here for fetch
         searchBar.value = movie.original_title; // Set the selected movie name in the search bar
         console.log('Selected Movie:', movie.original_title); // Log the selected movie
 
-        const selectedMovieDetails = fetch(`http://localhost:8000/api/recommend_movie/get_movie_details?movie_name=${movie.original_title}`)
-        
-        console.log("Selected Movie Details:", selectedMovieDetails);
+        try {
+          // Fetch movie details
+          const response = await fetch(`http://localhost:8000/api/recommend_movie/get_movie_details?movie_name=${encodeURIComponent(movie.original_title)}`);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch details for ${movie.original_title}, status: ${response.status}`);
+          }
 
-        localStorage.setItem('selected-movie', selectedMovieDetails); // Store the selected movie in local storage
+          const selectedMovieDetails = await response.json(); // Parse the JSON response
+          console.log("Selected Movie Details:", selectedMovieDetails);
 
-        window.location.href = 'selected-movie.html'; // Redirect to the selected movie page
+          // Store the selected movie in local storage
+          localStorage.setItem('selected-movie', JSON.stringify(selectedMovieDetails));
 
-        suggestionsBox.innerHTML = ''; // Clear the suggestions box
+          // Redirect to the selected movie page
+          window.location.href = 'selected-movie.html';
+
+          // Clear the suggestions box
+          suggestionsBox.innerHTML = '';
+        } catch (error) {
+          console.error('Error fetching selected movie details:', error);
+        }
       });
 
-      suggestionsBox.appendChild(suggestionItem); // Add suggestion to the box
+      // Add the suggestion item to the suggestions box
+      suggestionsBox.appendChild(suggestionItem);
     });
   }
 });
+
 
 // Hide suggestions box when clicking outside
 document.addEventListener('click', e => {
@@ -73,25 +88,25 @@ document.addEventListener('click', e => {
 
 async function fetchUserRatings() {
   try {
-      const username = localStorage.getItem('username') || document.getElementById('username').textContent.trim();
-      const url = `http://localhost:8000/api/user/get_ratings?username=${username}`;
-      const response = await fetch(url);
+    const username = localStorage.getItem('username') || document.getElementById('username').textContent.trim();
+    const url = `http://localhost:8000/api/user/get_ratings?username=${username}`;
+    const response = await fetch(url);
 
-      if (!response.ok) {
-          throw new Error(`Failed to fetch ratings for user ${username}`);
-      }
+    if (!response.ok) {
+      throw new Error(`Failed to fetch ratings for user ${username}`);
+    }
 
-      const responseData = await response.json();
-      console.log("User Ratings:", responseData);
+    const responseData = await response.json();
+    console.log("User Ratings:", responseData);
 
-      // Calculate the number of key-value pairs
-      const numberOfPairs = Object.keys(responseData).length;
-      console.log(`Number of key-value pairs in responseData: ${numberOfPairs}`);
+    // Calculate the number of key-value pairs
+    const numberOfPairs = Object.keys(responseData).length;
+    console.log(`Number of key-value pairs in responseData: ${numberOfPairs}`);
 
-      return numberOfPairs;
+    return numberOfPairs;
   } catch (error) {
-      console.error('Error fetching user ratings:', error);
-      return null;
+    console.error('Error fetching user ratings:', error);
+    return null;
   }
 }
 
@@ -128,24 +143,24 @@ async function renderMovieCards(data) {
 
   if (numberOfRatings >= 5) {
     try {
-        // Fetch collaborative recommendation
-        const response = await fetch(`http://localhost:8000/api/recommend_movie/collaborative_based?username=${localStorage.getItem('username')}`);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+      // Fetch collaborative recommendation
+      const response = await fetch(`http://localhost:8000/api/recommend_movie/collaborative_based?username=${localStorage.getItem('username')}`);
 
-        // Parse the JSON response
-        const collaborative_recommendation = await response.json();
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-        console.log("Collaborative Recommendation:", collaborative_recommendation);
+      // Parse the JSON response
+      const collaborative_recommendation = await response.json();
 
-        data = data.concat(collaborative_recommendation);
-        
+      console.log("Collaborative Recommendation:", collaborative_recommendation);
+
+      data = data.concat(collaborative_recommendation);
+
     } catch (error) {
-        console.error("Error fetching collaborative recommendations:", error);
+      console.error("Error fetching collaborative recommendations:", error);
     }
-}
+  }
 
   movieGrid.innerHTML = ''; // Clear previous movie cards
   const addedMovies = new Set(); // Track added movies by their IDs
