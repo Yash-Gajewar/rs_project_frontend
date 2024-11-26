@@ -15,7 +15,7 @@ fetch('./movies_json.json') // Adjust the path to the actual location of your JS
   .then(response => response.json()) // Parse the JSON response
   .then(data => {
     movieDataset = data; // Store the fetched movie data
-    console.log('Movie Dataset Loaded:', movieDataset); // Log to verify data
+    // console.log('Movie Dataset Loaded:', movieDataset); // Log to verify data
   })
   .catch(error => console.error('Error fetching movie data:', error)); // Handle errors
 
@@ -44,6 +44,16 @@ searchBar.addEventListener('input', () => {
       // Add click event to select suggestion
       suggestionItem.addEventListener('click', () => {
         searchBar.value = movie.original_title; // Set the selected movie name in the search bar
+        console.log('Selected Movie:', movie.original_title); // Log the selected movie
+
+        const selectedMovieDetails = fetch(`http://localhost:8000/api/recommend_movie/get_movie_details?movie_name=${movie.original_title}`)
+        
+        console.log("Selected Movie Details:", selectedMovieDetails);
+
+        localStorage.setItem('selected-movie', selectedMovieDetails); // Store the selected movie in local storage
+
+        window.location.href = 'selected-movie.html'; // Redirect to the selected movie page
+
         suggestionsBox.innerHTML = ''; // Clear the suggestions box
       });
 
@@ -59,44 +69,43 @@ document.addEventListener('click', e => {
   }
 });
 
-// Sample movie dataset in JSON format
-const movieData = {
-  Action: [
-    {
-      id: 69848,
-      title: "One Man's Hero",
-      overview: "One Man's Hero tells the little-known story of the 'St. Patrick's Battalion'...",
-      genres: ["Western", "Action", "Drama", "History"],
-      vote_average: 9.3
-    },
-    {
-      id: 155,
-      title: "The Dark Knight",
-      overview: "Batman raises the stakes in his war on crime...",
-      genres: ["Drama", "Action", "Crime", "Thriller"],
-      vote_average: 8.2
-    }
-    // Add more movies as needed
-  ],
-  Adventure: [
-    {
-      id: 43867,
-      title: "The Prisoner of Zenda",
-      overview: "An Englishman on a Ruritarian holiday must impersonate the king...",
-      genres: ["Adventure", "Drama", "Romance"],
-      vote_average: 7.5
-    }
-  ]
-};
+
+
+async function fetchUserRatings() {
+  try {
+      const username = localStorage.getItem('username') || document.getElementById('username').textContent.trim();
+      const url = `http://localhost:8000/api/user/get_ratings?username=${username}`;
+      const response = await fetch(url);
+
+      if (!response.ok) {
+          throw new Error(`Failed to fetch ratings for user ${username}`);
+      }
+
+      const responseData = await response.json();
+      console.log("User Ratings:", responseData);
+
+      // Calculate the number of key-value pairs
+      const numberOfPairs = Object.keys(responseData).length;
+      console.log(`Number of key-value pairs in responseData: ${numberOfPairs}`);
+
+      return numberOfPairs;
+  } catch (error) {
+      console.error('Error fetching user ratings:', error);
+      return null;
+  }
+}
+
 
 async function fetchMovieDetails(movieId) {
+
   try {
     const url = `https://api.themoviedb.org/3/movie/${movieId}?api_key=83b44cdf02bdd95a7c2fa4ab67514e6a&language=en-US`;
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`Failed to fetch details for movie ID ${movieId}`);
     }
-    const responseData = await response.json();
+    var responseData = await response.json();
+
     return {
       posterPath: `https://image.tmdb.org/t/p/w500/${responseData.poster_path || ''}`,
       title: responseData.original_title || 'No title available',
@@ -109,7 +118,35 @@ async function fetchMovieDetails(movieId) {
   }
 }
 
+
+
 async function renderMovieCards(data) {
+
+  console.log("Top 5 highly rated movies:", data)
+
+  const numberOfRatings = await fetchUserRatings();
+
+  if (numberOfRatings >= 5) {
+    try {
+        // Fetch collaborative recommendation
+        const response = await fetch(`http://localhost:8000/api/recommend_movie/collaborative_based?username=${localStorage.getItem('username')}`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        // Parse the JSON response
+        const collaborative_recommendation = await response.json();
+
+        console.log("Collaborative Recommendation:", collaborative_recommendation);
+
+        data = data.concat(collaborative_recommendation);
+        
+    } catch (error) {
+        console.error("Error fetching collaborative recommendations:", error);
+    }
+}
+
   movieGrid.innerHTML = ''; // Clear previous movie cards
   const addedMovies = new Set(); // Track added movies by their IDs
 
@@ -125,6 +162,7 @@ async function renderMovieCards(data) {
 
       // Fetch movie details
       const movieDetails = await fetchMovieDetails(movie.id);
+
       if (!movieDetails) {
         continue; // Skip if movie details couldn't be fetched
       }

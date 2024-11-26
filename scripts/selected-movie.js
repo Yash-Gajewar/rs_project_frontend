@@ -16,7 +16,7 @@ function rateMovie(rating) {
     star.style.display = 'none';
   });
 
-  const apiUrl = `http://localhost:8000/api/user/post_ratings?email=${localStorage.getItem('email')}`;
+  const apiUrl = `http://localhost:8000/api/user/post_ratings?username=${localStorage.getItem('username')}`;
 
   // Prepare the ratings data as an array
   const user_ratings_data = [

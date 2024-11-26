@@ -1,31 +1,23 @@
-// Add your API endpoint here
-var API_ENDPOINT = "https://cpa5dezyp9.execute-api.ap-south-1.amazonaws.com/check-rs-user";
-
 // AJAX POST request for login
 document.getElementById("loginForm").onsubmit = function(event) {
     event.preventDefault(); // Prevent the default form submission
 
-    // Gather the form input data
-    var inputData = {
-        "email": $('#text').val(),
-        "password": $('#password').val()
-    };
-
+    var username = document.getElementById("username").value;
+    var password = document.getElementById("password").value;
     // Make AJAX request
     $.ajax({
-        url: API_ENDPOINT,
-        type: 'POST',
-        data: JSON.stringify(inputData),
-        contentType: 'application/json; charset=utf-8',
+        url: `http://localhost:8000/api/user/userexists?username=${username}&password=${password}`,
+        type: 'GET',
+        contentType: 'application/json',
         success: function(response) {
-            var responseData = JSON.parse(response.body); // Parse the response body
-
+            console.log(response)
+            
             // If login is successful, redirect to home.html
-            if (responseData.message) {
+            if (response) {
                 window.location.href = "home.html";
             } else {
                 // If login fails, show an alert with the reason
-                alert("Login failed: " + responseData.reason);
+                alert("Invalid username or password.");
             }
         },
         error: function() {
